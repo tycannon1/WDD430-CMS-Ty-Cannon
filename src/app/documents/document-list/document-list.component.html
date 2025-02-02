@@ -1,0 +1,34 @@
+<div class="container">
+    <!-- Document List Section (Left) -->
+    <div class="document-list">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row pad-left-right">
+            <span class="pull-left title">Documents</span>
+            <a class="btn btn-success pull-right">Add Document</a>
+          </div>
+        </div>
+        <!-- Loop over documents here -->
+        <div *ngFor="let document of documents">
+          <cms-document-item
+            [document]="document"
+            (click)="onSelectedDocument(document)">
+          </cms-document-item>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Document Detail Section (Right) -->
+    <div class="document-detail" *ngIf="selectedDocument">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4>{{ selectedDocument.name }}</h4>
+        </div>
+        <div class="panel-body">
+          <p>{{ selectedDocument.description }}</p>
+          <a href="{{ selectedDocument.url }}" target="_blank">Open Document</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  

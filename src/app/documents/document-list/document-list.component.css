@@ -1,0 +1,23 @@
+.container {
+    display: flex; /* Aligns items side by side */
+    flex-direction: row; /* Ensures left-right layout */
+    gap: 20px; /* Adds space between sections */
+  }
+  
+  .document-list {
+    flex: 1; /* Takes up the available space */
+    max-width: 50%; /* Ensures the document list stays on the left */
+    padding: 10px;
+  }
+  
+  .document-detail {
+    flex: 1; /* Takes up the available space */
+    max-width: 50%; /* Ensures the document details stay on the right */
+    padding: 10px;
+  }
+  
+  .panel {
+    margin: 10px 0;
+  }
+  
+  

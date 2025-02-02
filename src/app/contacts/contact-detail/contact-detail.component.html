@@ -1,13 +1,13 @@
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">Contact Name</h3>
+        <h3 class="panel-title">{{ contact?.name }}</h3> <!-- Display contact name -->
     </div>
     <div class="panel-body">
         <div class="row">
             <div class="col-xs-12 text-center">
                 <img 
-                    [src]="" 
-                    alt="contact.name" 
+                    [src]="contact?.imagePath" 
+                    alt="{{ contact?.name }}" 
                     class="img-thumbnail"
                     style="max-height:100px;">
             </div>
@@ -22,9 +22,10 @@
         </div>
         <div class="row">
             <div class="col-xs-12">
-                <p><strong>Email:</strong> Email</p>
-                <p><strong>Phone:</strong> Phone</p>
+                <p><strong>Email:</strong> {{ contact?.email }}</p> <!-- Display contact email -->
+                <p><strong>Phone:</strong> {{ contact?.phone }}</p> <!-- Display contact phone -->
             </div>
         </div>
     </div>
 </div>
+

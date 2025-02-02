@@ -12,4 +12,11 @@ import { ContactDetailComponent } from './contacts/contact-detail/contact-detail
 })
 export class AppComponent {
   title = 'cms';
+
+  selectedFeature = 'documents';  // This will hold the current feature
+
+  // This method switches the selected feature
+  switchView(selectedFeature: string) {
+    this.selectedFeature = selectedFeature;
+  }
 }
