@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Document } from '../document.model';
+import { DocumentService } from '../document.service';
 
 @Component({
   standalone: false,
@@ -7,20 +8,33 @@ import { Document } from '../document.model';
   templateUrl: './document-list.component.html',
   styleUrls: ['./document-list.component.css']
 })
-export class DocumentListComponent {
-  documents: Document[] = [
-    new Document('1', 'Document 1', 'Description of Document 1', 'url1.com', []),
-    new Document('2', 'Document 2', 'Description of Document 2', 'url2.com', []),
-    new Document('3', 'Document 3', 'Description of Document 3', 'url3.com', []),
-    new Document('4', 'Document 4', 'Description of Document 4', 'url4.com', [])
-  ];
+export class DocumentListComponent implements OnInit {
+  documents: Document[] = [];
 
-  @Output() selectedDocumentEvent = new EventEmitter<Document>();
+  constructor(private documentService: DocumentService) {}
+
+  ngOnInit(): void {
+    this.documents = this.documentService.getDocuments();
+    console.log('Documents in List:', this.documents);
+  
+    this.documentService.documentChangedEvent.subscribe((documents: Document[]) => {
+      this.documents = documents;
+      console.log('Updated Documents:', this.documents);
+    });
+  
+    // Subscribe to selected document
+    this.documentService.documentSelectedEvent.subscribe((document: Document) => {
+      this.selectedDocument = document;
+      console.log('Selected Document:', this.selectedDocument);
+    });
+  }
+  
+
   selectedDocument: Document | null = null;
 
   onSelectedDocument(document: Document) {
-    this.selectedDocument = document;
-    this.selectedDocumentEvent.emit(document);
+    this.documentService.documentSelectedEvent.emit(document);
   }
 }
+
 

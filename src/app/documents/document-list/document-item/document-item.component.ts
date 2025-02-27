@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { Document } from '../document.model';
+import { Document } from '../../document.model';
+import { DocumentService } from '../../document.service';
 
 @Component({
   standalone: false,
@@ -9,5 +10,12 @@ import { Document } from '../document.model';
 })
 export class DocumentItemComponent {
   @Input() document: Document;
+
+  constructor(private documentService: DocumentService) {}
+
+  onSelectDocument() {
+    this.documentService.documentSelectedEvent.emit(this.document);
+  }
 }
+
 

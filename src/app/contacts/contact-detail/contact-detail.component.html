@@ -1,31 +1,19 @@
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">{{ contact?.name }}</h3> <!-- Display contact name -->
-    </div>
-    <div class="panel-body">
-        <div class="row">
-            <div class="col-xs-12 text-center">
-                <img 
-                    [src]="contact?.imagePath" 
-                    alt="{{ contact?.name }}" 
-                    class="img-thumbnail"
-                    style="max-height:100px;">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12 text-center">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-primary">Edit</button>
-                    <button type="button" class="btn btn-danger">Delete</button>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12">
-                <p><strong>Email:</strong> {{ contact?.email }}</p> <!-- Display contact email -->
-                <p><strong>Phone:</strong> {{ contact?.phone }}</p> <!-- Display contact phone -->
-            </div>
-        </div>
-    </div>
-</div>
+<div *ngIf="contact">
+    <h2>{{ contact.name }}</h2>
+    <img [src]="contact.imageUrl" alt="{{ contact.name }}">
+    <p><strong>Email:</strong> {{ contact.email }}</p>
+    <p><strong>Phone:</strong> {{ contact.phone }}</p>
+  
+    <a [routerLink]="['edit']" class="btn btn-info">Edit</a>
+    <button (click)="onDelete()">Delete</button>
+  </div>
+  
+  <p *ngIf="!contact" class="text-center text-muted">
+    Please select a contact to view details.
+  </p>
+  
+  
+
+  
+  
 

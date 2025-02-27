@@ -1,26 +1,41 @@
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Contact } from '../contact.model';
+import { ContactService } from '../contact.service';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: false,
   selector: 'cms-contact-list',
   templateUrl: './contact-list.component.html',
-  styleUrl: './contact-list.component.css'
+  styleUrls: ['./contact-list.component.css']
 })
 export class ContactListComponent implements OnInit {
-  @Output() selectedContactEvent = new EventEmitter<Contact>();
+  contacts: Contact[] = [];
 
-  contacts: Contact[] = [
-    new Contact('1', 'Bro. Barzeer', 'email1', 'phone1', '/assets/images/barzeer.jpg', null),
-    new Contact('2', 'Bro. Jackson', 'email2', 'phone2', '/assets/images/jacksonk.jpg', null)
-  ];
+  constructor(private contactService: ContactService, private router: Router) {} // Inject Router
 
-  constructor() {}
+  ngOnInit(): void {
+    console.log('ContactListComponent Initialized');
+    this.contacts = this.contactService.getContacts();
+    console.log('Contacts in List:', this.contacts);
 
-  ngOnInit() {}
+    this.contactService.contactChangedEvent.subscribe(
+      (contacts: Contact[]) => {
+        this.contacts = contacts;
+        console.log('Updated Contacts:', this.contacts);
+      }
+    );
+  }
 
   onSelected(contact: Contact) {
-    this.selectedContactEvent.emit(contact);
+    // Emit the event (if needed)
+    this.contactService.contactSelectedEvent.emit(contact);
+
+    // Navigate to the contact detail page
+    this.router.navigate(['/contacts', contact.id]);
   }
 }
+
+
+
 

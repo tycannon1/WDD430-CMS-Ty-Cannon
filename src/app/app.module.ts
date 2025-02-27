@@ -7,15 +7,20 @@ import { HeaderComponent } from './header/header.component';
 import { ContactsComponent } from './contacts/contacts.component';
 import { ContactListComponent } from './contacts/contact-list/contact-list.component';
 import { ContactDetailComponent } from './contacts/contact-detail/contact-detail.component';
-import { ContactItemComponent } from './contacts/contact-item/contact-item.component';
+import { ContactItemComponent } from './contacts/contact-list/contact-item/contact-item.component';
 import { DocumentsComponent } from './documents/documents.component';
 import { DocumentListComponent } from './documents/document-list/document-list.component';
-import { DocumentItemComponent } from './documents/document-item/document-item.component';
+import { DocumentItemComponent } from './documents/document-list/document-item/document-item.component';
 import { DocumentDetailComponent } from './documents/document-detail/document-detail.component';
 import { MessagesComponent } from './messages/messages.component';
 import { MessageListComponent } from './messages/message-list/message-list.component';
 import { MessageItemComponent } from './messages/message-item/message-item.component';
 import { MessageEditComponent } from './messages/message-edit/message-edit.component';
+import { AppRoutingModule } from './app-routing.module';
+import { DocumentEditComponent } from './documents/document-edit/document-edit.component';
+import { ContactEditComponent } from './contacts/contact-edit/contact-edit.component';
+import { ContactService } from './contacts/contact.service';  // ✅ Import ContactService
+import { DocumentService } from './documents/document.service';
 
 @NgModule({
   declarations: [
@@ -33,12 +38,19 @@ import { MessageEditComponent } from './messages/message-edit/message-edit.compo
     MessageListComponent,
     MessageItemComponent,
     MessageEditComponent,
-    DropdownDirective, 
+    DropdownDirective,
+    DocumentEditComponent,
+    ContactEditComponent, 
   ],
   imports: [
     BrowserModule,
+    AppRoutingModule,
+    
   ],
-  providers: [],
+  providers: [
+    ContactService,  
+    DocumentService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
