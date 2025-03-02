@@ -19,7 +19,7 @@ export class ContactListComponent implements OnInit {
     this.contacts = this.contactService.getContacts();
     console.log('Contacts in List:', this.contacts);
 
-    this.contactService.contactChangedEvent.subscribe(
+    this.contactService.contactListChangedEvent.subscribe(
       (contacts: Contact[]) => {
         this.contacts = contacts;
         console.log('Updated Contacts:', this.contacts);
@@ -29,7 +29,7 @@ export class ContactListComponent implements OnInit {
 
   onSelected(contact: Contact) {
     // Emit the event (if needed)
-    this.contactService.contactSelectedEvent.emit(contact);
+    this.contactService.contactSelectedEvent.next(contact);
 
     // Navigate to the contact detail page
     this.router.navigate(['/contacts', contact.id]);

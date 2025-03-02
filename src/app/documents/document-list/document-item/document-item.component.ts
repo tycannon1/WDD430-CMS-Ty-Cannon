@@ -14,7 +14,7 @@ export class DocumentItemComponent {
   constructor(private documentService: DocumentService) {}
 
   onSelectDocument() {
-    this.documentService.documentSelectedEvent.emit(this.document);
+    this.documentService.documentSelectedEvent.next(this.document);
   }
 }
 

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NgForm } from '@angular/forms';
 import { Contact } from '../contact.model';
 import { ContactService } from '../contact.service';
 
@@ -10,31 +11,54 @@ import { ContactService } from '../contact.service';
   styleUrls: ['./contact-edit.component.css']
 })
 export class ContactEditComponent implements OnInit {
-  contact: Contact | null = null;
-  contactId!: string;
+  contact: Contact;
+  originalContact: Contact;
+  editMode = false;
 
   constructor(
     private contactService: ContactService,
-    private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      this.contactId = params['id'];
-      if (this.contactId) {
-        this.contact = this.contactService.getContact(this.contactId);
+      const id = params['id'];
+      if (!id) {
+        this.editMode = false;
+        return;
       }
+
+      this.originalContact = this.contactService.getContact(id);
+      if (!this.originalContact) return;
+
+      this.editMode = true;
+      this.contact = { ...this.originalContact }; // Clone for editing
     });
   }
 
-  onSave() {
-    // Logic for saving the contact (either update or create)
-    this.router.navigate(['/contacts']); // Navigate back after saving
+  onSubmit(form: NgForm) {
+    if (form.invalid) return;
+
+    const newContact = new Contact(
+      this.contact?.id || '',
+      form.value.name,
+      form.value.email,
+      form.value.phone,
+      form.value.imagePath,
+      []
+    );
+
+    if (this.editMode) {
+      this.contactService.updateContact(this.originalContact, newContact);
+    } else {
+      this.contactService.addContact(newContact);
+    }
+
+    this.router.navigate(['/contacts']);
   }
 
   onCancel() {
-    this.router.navigate(['/contacts']); // Navigate back without saving
+    this.router.navigate(['/contacts']);
   }
 }
-

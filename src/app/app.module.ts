@@ -21,6 +21,8 @@ import { DocumentEditComponent } from './documents/document-edit/document-edit.c
 import { ContactEditComponent } from './contacts/contact-edit/contact-edit.component';
 import { ContactService } from './contacts/contact.service';  // ✅ Import ContactService
 import { DocumentService } from './documents/document.service';
+import { FormsModule } from '@angular/forms';
+
 
 @NgModule({
   declarations: [
@@ -45,6 +47,7 @@ import { DocumentService } from './documents/document.service';
   imports: [
     BrowserModule,
     AppRoutingModule,
+    FormsModule
     
   ],
   providers: [
