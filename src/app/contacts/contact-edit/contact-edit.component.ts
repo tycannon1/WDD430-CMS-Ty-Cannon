@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { Contact } from '../contact.model';
 import { ContactService } from '../contact.service';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 @Component({
   standalone: false,
@@ -13,7 +14,9 @@ import { ContactService } from '../contact.service';
 export class ContactEditComponent implements OnInit {
   contact: Contact;
   originalContact: Contact;
-  editMode = false;
+  groupContacts: Contact[] = [];
+  editMode: boolean = false;
+  id: string;
 
   constructor(
     private contactService: ContactService,
@@ -22,7 +25,7 @@ export class ContactEditComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
+    this.route.params.subscribe((params: Params) => {
       const id = params['id'];
       if (!id) {
         this.editMode = false;
@@ -33,20 +36,23 @@ export class ContactEditComponent implements OnInit {
       if (!this.originalContact) return;
 
       this.editMode = true;
-      this.contact = { ...this.originalContact }; // Clone for editing
+      this.contact = JSON.parse(JSON.stringify(this.originalContact));
+
+      if (this.contact.group) {
+        this.groupContacts = JSON.parse(JSON.stringify(this.contact.group));
+      }
     });
   }
 
-  onSubmit(form: NgForm) {
-    if (form.invalid) return;
-
+  onSubmit(form: NgForm): void {
+    const value = form.value;
     const newContact = new Contact(
-      this.contact?.id || '',
-      form.value.name,
-      form.value.email,
-      form.value.phone,
-      form.value.imagePath,
-      []
+      value.id,
+      value.name,
+      value.email,
+      value.phone,
+      value.imageUrl,
+      this.groupContacts
     );
 
     if (this.editMode) {
@@ -58,7 +64,22 @@ export class ContactEditComponent implements OnInit {
     this.router.navigate(['/contacts']);
   }
 
-  onCancel() {
+  onCancel(): void {
     this.router.navigate(['/contacts']);
+  }
+
+  onRemoveItem(index: number): void {
+    this.groupContacts.splice(index, 1);
+  }
+
+  isInvalidContact(newContact: Contact): boolean {
+    if (!newContact || this.contact.id === newContact.id) return true;
+    return this.groupContacts.some(c => c.id === newContact.id);
+  }
+
+  addToGroup(event: CdkDragDrop<Contact[]>): void {
+    const selectedContact: Contact = event.item.data;
+    if (this.isInvalidContact(selectedContact)) return;
+    this.groupContacts.push(selectedContact);
   }
 }

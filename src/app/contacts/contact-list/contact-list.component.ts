@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Contact } from '../contact.model';
 import { ContactService } from '../contact.service';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   standalone: false,
@@ -9,33 +10,37 @@ import { Router } from '@angular/router';
   templateUrl: './contact-list.component.html',
   styleUrls: ['./contact-list.component.css']
 })
-export class ContactListComponent implements OnInit {
+export class ContactListComponent implements OnInit, OnDestroy {
   contacts: Contact[] = [];
+  term: string = '';
+  private subscription: Subscription; //   Handle subscription
 
-  constructor(private contactService: ContactService, private router: Router) {} // Inject Router
+  constructor(private contactService: ContactService, private router: Router) {}
 
   ngOnInit(): void {
-    console.log('ContactListComponent Initialized');
-    this.contacts = this.contactService.getContacts();
-    console.log('Contacts in List:', this.contacts);
+    //   Trigger Firebase request
+    this.contactService.getContacts();
 
-    this.contactService.contactListChangedEvent.subscribe(
-      (contacts: Contact[]) => {
+    //   Subscribe to changes in the contact list
+    this.subscription = this.contactService.contactListChangedEvent
+      .subscribe((contacts: Contact[]) => {
         this.contacts = contacts;
-        console.log('Updated Contacts:', this.contacts);
-      }
-    );
+      });
+  }
+
+  ngOnDestroy(): void {
+    //   Prevent memory leaks
+    this.subscription.unsubscribe();
   }
 
   onSelected(contact: Contact) {
-    // Emit the event (if needed)
     this.contactService.contactSelectedEvent.next(contact);
-
-    // Navigate to the contact detail page
     this.router.navigate(['/contacts', contact.id]);
   }
+
+  search(value: string) {
+    this.term = value;
+  }
 }
-
-
 
 
