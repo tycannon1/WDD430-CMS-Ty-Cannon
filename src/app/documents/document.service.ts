@@ -1,47 +1,7 @@
-// import { Injectable, EventEmitter } from '@angular/core';
-// import { Document } from './document.model';
-// import { MOCKDOCUMENTS } from './MOCKDOCUMENTS';
-// import { Subject } from 'rxjs';
-
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class DocumentService {
-//   documents: Document[] = [];
-//   documentSelectedEvent = new EventEmitter<Document>();
-//   documentChangedEvent = new EventEmitter<Document[]>();
-
-
-//   constructor() {
-//     this.documents = MOCKDOCUMENTS;
-//     console.log('Documents Loaded:', this.documents);
-//   }
-
-//   getDocuments(): Document[] {
-//     console.log('Documents Loaded:', this.documents);
-//     return this.documents.slice();
-
-//   }
-
-//   getDocument(id: string): Document {
-//     return this.documents.find(document => document.id === id) || null;
-//   }
-
-//   deleteDocument(document: Document) {
-//     if (!document) return;
-//     const pos = this.documents.indexOf(document);
-//     if (pos < 0) return;
-//     this.documents.splice(pos, 1);
-//     this.documentChangedEvent.emit(this.documents.slice());
-//   }
-  
-// }
-
 import { Injectable } from '@angular/core';
 import { Document } from './document.model';
-import { MOCKDOCUMENTS } from './MOCKDOCUMENTS';
 import { Subject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -50,17 +10,32 @@ export class DocumentService {
   documents: Document[] = [];
   documentSelectedEvent = new Subject<Document>();
   documentListChangedEvent = new Subject<Document[]>();
-  maxDocumentId: number = 0; // ✅ Declare maxDocumentId here
+  maxDocumentId: number = 0;
 
-  constructor() {
-    this.documents = MOCKDOCUMENTS;
-    this.maxDocumentId = this.getMaxId(); // ✅ Now this works
-    console.log('Documents Loaded:', this.documents);
-  }
+  //   This is the CORRECT URL for your Firebase database (with .json)
+  private firebaseUrl: string = 'https://cms2025-88a1f-default-rtdb.firebaseio.com/documents.json';
 
-  getDocuments(): Document[] {
-    console.log('Documents Loaded:', this.documents);
-    return this.documents.slice();
+  constructor(private http: HttpClient) {}
+
+  getDocuments(): void {
+    //   Make a GET request to Firebase
+    this.http.get<Document[]>(this.firebaseUrl)
+      .subscribe(
+        (documents: Document[]) => {
+          if (!documents) {
+            this.documents = [];
+          } else {
+            this.documents = documents;
+          }
+
+          this.maxDocumentId = this.getMaxId();
+          this.sortDocuments();
+          this.documentListChangedEvent.next(this.documents.slice());
+        },
+        (error: any) => {
+          console.error('Failed to fetch documents:', error);
+        }
+      );
   }
 
   getDocument(id: string): Document {
@@ -83,9 +58,9 @@ export class DocumentService {
 
     this.maxDocumentId++;
     newDocument.id = this.maxDocumentId.toString();
-
     this.documents.push(newDocument);
-    this.documentListChangedEvent.next(this.documents.slice()); // ✅ Use .next() instead of emit()
+
+    this.storeDocuments(); //   Save to Firebase
   }
 
   updateDocument(originalDocument: Document, newDocument: Document) {
@@ -96,7 +71,8 @@ export class DocumentService {
 
     newDocument.id = originalDocument.id;
     this.documents[pos] = newDocument;
-    this.documentListChangedEvent.next(this.documents.slice()); // ✅ Use .next()
+
+    this.storeDocuments(); //   Save to Firebase
   }
 
   deleteDocument(document: Document) {
@@ -106,6 +82,20 @@ export class DocumentService {
     if (pos < 0) return;
 
     this.documents.splice(pos, 1);
-    this.documentListChangedEvent.next(this.documents.slice()); // ✅ Use .next()
+
+    this.storeDocuments(); //   Save to Firebase
+  }
+
+  //   Store documents in Firebase using PUT request
+  storeDocuments(): void {
+    this.http.put(this.firebaseUrl, this.documents)
+      .subscribe(() => {
+        this.documentListChangedEvent.next(this.documents.slice());
+      });
+  }
+
+  //   Sort documents by name
+  sortDocuments(): void {
+    this.documents.sort((a, b) => (a.name > b.name ? 1 : a.name < b.name ? -1 : 0));
   }
 }

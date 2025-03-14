@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MessageService } from '../message.service';
 import { Message } from '../message.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   standalone: false,
@@ -8,26 +9,33 @@ import { Message } from '../message.model';
   templateUrl: './message-list.component.html',
   styleUrls: ['./message-list.component.css']
 })
-export class MessageListComponent implements OnInit {
+export class MessageListComponent implements OnInit, OnDestroy {
   messages: Message[] = [];
+  private subscription: Subscription;
 
   constructor(private messageService: MessageService) {}
 
   ngOnInit(): void {
-    this.messages = this.messageService.getMessages();
-    this.messageService.messageChangedEvent.subscribe(
-      (messages: Message[]) => {
+    //   Call getMessages() to trigger Firebase request
+    this.messageService.getMessages();
+
+    //   Subscribe to the event for real-time updates
+    this.subscription = this.messageService.messageChangedEvent
+      .subscribe((messages: Message[]) => {
         this.messages = messages;
-      }
-    );
+      });
   }
 
-  // Add this method inside the class
+  // Prevent memory leaks
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
+  // Handle new message being added
   onAddMessage(message: Message) {
     console.log('New message added:', message);
-    this.messages.push(message); // Update the message list
+    this.messageService.addMessage(message);
   }
 }
-
 
 
